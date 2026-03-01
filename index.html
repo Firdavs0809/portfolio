@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Firdavs Jalolov — Python Backend Developer</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f5f7fb;
+      --surface: #ffffff;
+      --border: #e5e7eb;
+      --accent: #2563eb;
+      --accent2: #a855f7;
+      --text: #0f172a;
+      --muted: #6b7280;
+      --mono: 'IBM Plex Mono', monospace;
+      --sans: 'Syne', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--mono);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* noise overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.15;
+    }
+
+    /* grid background */
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,229,160,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,160,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      border-bottom: 1px solid rgba(148,163,184,0.4);
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 10px 30px rgba(15,23,42,0.06);
+    }
+
+    nav .inner {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-logo {
+      font-family: var(--sans);
+      font-weight: 800;
+      font-size: 16px;
+      color: var(--accent);
+      letter-spacing: -0.5px;
+    }
+
+    .nav-links { display: flex; gap: 24px; }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 12px;
+      letter-spacing: 0.05em;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding-top: 88px;
+    }
+
+    .hero-inner {
+      width: 100%;
+      padding: 120px 0 80px;
+      display: flex;
+      align-items: center;
+      gap: 64px;
+    }
+
+    .hero-left {
+      flex: 1.2;
+    }
+
+    .hero-right {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      border: 1px solid rgba(0,229,160,0.2);
+      padding: 6px 12px;
+      margin-bottom: 32px;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .hero-tag::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.8); }
+    }
+
+    h1 {
+      font-family: var(--sans);
+      font-size: clamp(38px, 6vw, 64px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -1.5px;
+      margin-bottom: 16px;
+      color: var(--text);
+      animation: fadeUp 0.6s 0.1s ease both;
+    }
+
+    h1 span {
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-role {
+      font-size: 16px;
+      font-weight: 500;
+      color: #111827;
+      margin-bottom: 16px;
+      animation: fadeUp 0.6s 0.15s ease both;
+    }
+
+    .hero-desc {
+      font-size: 14px;
+      color: var(--muted);
+      max-width: 520px;
+      margin-bottom: 32px;
+      line-height: 1.9;
+      animation: fadeUp 0.6s 0.2s ease both;
+    }
+
+    .hero-links {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      animation: fadeUp 0.6s 0.3s ease both;
+    }
+
+    .hero-portrait {
+      max-width: 320px;
+      width: 100%;
+      padding: 4px;
+      border-radius: 32px;
+      background:
+        radial-gradient(circle at top left, rgba(37,99,235,0.2), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(168,85,247,0.25), transparent 55%);
+      box-shadow: 0 24px 60px rgba(15,23,42,0.18);
+      animation: fadeUp 0.6s 0.25s ease both;
+    }
+
+    .hero-portrait-inner {
+      background: var(--surface);
+      border-radius: 28px;
+      padding: 32px 32px 40px;
+      min-height: 320px;
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .hero-portrait-circle {
+      width: 190px;
+      height: 230px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 0%, #f9fafb, #e5e7eb 60%, #d1d5db 100%);
+    }
+
+    .hero-photo {
+      width: 190px;
+      height: 230px;
+      border-radius: 999px;
+      object-fit: cover;
+      box-shadow: 0 18px 40px rgba(15,23,42,0.35);
+    }
+
+    .hero-emoji {
+      position: absolute;
+      top: 20px;
+      right: 24px;
+      font-size: 24px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.05em;
+      text-decoration: none;
+      border: 1px solid;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+      border-color: var(--accent);
+      font-weight: 600;
+    }
+    .btn-primary:hover { background: transparent; color: var(--accent); }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border-color: var(--border);
+    }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+
+    .hero-stats {
+      display: flex;
+      gap: 40px;
+      margin-top: 48px;
+      padding-top: 32px;
+      border-top: 1px solid rgba(148,163,184,0.4);
+      animation: fadeUp 0.6s 0.4s ease both;
+    }
+
+    .stat-num {
+      font-family: var(--sans);
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      margin-top: 4px;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* SECTIONS */
+    section {
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .section-label {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      margin-bottom: 40px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    h2 {
+      font-family: var(--sans);
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 40px;
+    }
+
+    /* EXPERIENCE */
+    .exp-item {
+      display: grid;
+      grid-template-columns: 1fr 3fr;
+      gap: 24px;
+      padding: 24px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      margin-bottom: 16px;
+    }
+
+    .exp-item:last-child { border-bottom: none; }
+
+    .exp-meta { }
+
+    .exp-company {
+      font-family: var(--sans);
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .exp-date {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .exp-location {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .exp-role {
+      font-size: 11px;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      margin-bottom: 12px;
+    }
+
+    .exp-desc {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 16px;
+      line-height: 1.7;
+    }
+
+    .exp-bullets { list-style: none; }
+    .exp-bullets li {
+      font-size: 12px;
+      color: #888;
+      padding: 4px 0;
+      padding-left: 16px;
+      position: relative;
+      line-height: 1.6;
+    }
+    .exp-bullets li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-size: 10px;
+    }
+
+    .highlight {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* SKILLS */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    .skill-group {
+      background: var(--surface);
+      padding: 24px;
+    }
+
+    .skill-group-title {
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .skill-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tag {
+      font-size: 11px;
+      padding: 4px 8px;
+      border: 1px solid var(--border);
+      color: #888;
+      transition: all 0.2s;
+    }
+
+    .tag:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* PROJECTS */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    .project-card {
+      background: var(--surface);
+      padding: 28px;
+      transition: box-shadow 0.2s, transform 0.2s;
+      box-shadow: 0 10px 30px rgba(15,23,42,0.03);
+      border-radius: 18px;
+    }
+
+    .project-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 18px 40px rgba(15,23,42,0.08);
+    }
+
+    .project-icon {
+      font-size: 20px;
+      margin-bottom: 16px;
+    }
+
+    .project-name {
+      font-family: var(--sans);
+      font-weight: 700;
+      font-size: 15px;
+      margin-bottom: 8px;
+    }
+
+    .project-desc {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+
+    .project-tech {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tech-tag {
+      font-size: 10px;
+      padding: 3px 7px;
+      background: rgba(0,229,160,0.05);
+      border: 1px solid rgba(0,229,160,0.15);
+      color: var(--accent);
+    }
+
+    /* CONTACT */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    .contact-item {
+      background: var(--surface);
+      padding: 24px;
+      text-decoration: none;
+      display: block;
+      transition: box-shadow 0.2s, transform 0.2s;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(15,23,42,0.03);
+    }
+
+    .contact-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 40px rgba(15,23,42,0.08);
+    }
+
+    .contact-label {
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .contact-value {
+      font-size: 13px;
+      color: var(--text);
+      word-break: break-all;
+    }
+
+    .contact-item:hover .contact-value { color: var(--accent); }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 24px 0;
+      text-align: center;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 600px) {
+      .hero-inner {
+        padding: 96px 0 60px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 40px;
+      }
+      .hero-right {
+        align-self: stretch;
+        justify-content: center;
+      }
+      .exp-item { grid-template-columns: 1fr; }
+      .hero-stats { gap: 24px; flex-wrap: wrap; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+
+  <nav>
+    <div class="inner">
+      <div class="nav-logo">FJ</div>
+      <div class="nav-links">
+        <a href="#experience">Experience</a>
+        <a href="#skills">Skills</a>
+        <a href="#projects">Projects</a>
+        <a href="#contact">Contact</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="container">
+      <div class="hero-inner">
+        <div class="hero-left">
+          <div class="hero-tag">OPEN TO OPPORTUNITIES</div>
+          <h1>Hi, I'm <span>Firdavs Jalolov</span></h1>
+          <p class="hero-role">Python Backend Developer</p>
+          <p class="hero-desc">
+            Backend engineer with 2.5+ years building and scaling production systems.
+            Specialized in Django, DRF, PostgreSQL, Redis, and cloud integrations, based in Tashkent, Uzbekistan.
+          </p>
+          <div class="hero-links">
+            <a href="mailto:jalolov.firdavs0809@gmail.com" class="btn btn-primary">Get in touch →</a>
+            <a href="https://github.com/Firdavs0809" target="_blank" class="btn btn-outline">GitHub</a>
+            <a href="https://www.linkedin.com/in/jalolov-firdavs/" target="_blank" class="btn btn-outline">LinkedIn</a>
+          </div>
+          <div class="hero-stats">
+            <div>
+              <div class="stat-num">2.5+</div>
+              <div class="stat-label">YEARS EXP</div>
+            </div>
+            <div>
+              <div class="stat-num">5x</div>
+              <div class="stat-label">TEST SPEED</div>
+            </div>
+            <div>
+              <div class="stat-num">1.5x</div>
+              <div class="stat-label">QUERY PERF</div>
+            </div>
+            <div>
+              <div class="stat-num">C1</div>
+              <div class="stat-label">ENGLISH</div>
+            </div>
+          </div>
+        </div>
+        <div class="hero-right">
+          <div class="hero-portrait">
+            <div class="hero-portrait-inner">
+              <span class="hero-emoji">👋</span>
+              <img src="firdavs.jpg" alt="Firdavs Jalolov" class="hero-photo">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPERIENCE -->
+  <section id="experience">
+    <div class="container">
+      <div class="section-label">EXPERIENCE</div>
+
+      <div class="exp-item">
+        <div class="exp-meta">
+          <div class="exp-company">Magis Corp</div>
+          <div class="exp-date">May 2024 — Feb 2026</div>
+          <div class="exp-location">1 yr 8 months</div>
+        </div>
+        <div>
+          <div class="exp-role">PYTHON BACKEND DEVELOPER</div>
+          <p class="exp-desc">Developed and scaled an advanced HR platform delivering features across backend, frontend, and integrations.</p>
+          <ul class="exp-bullets">
+            <li>Migrated <span class="highlight">500+ test suite</span> from DRF to pytest, reducing execution from <span class="highlight">20min → 4min (5x faster)</span></li>
+            <li>Improved query performance by <span class="highlight">1.5x</span> through caching, rate-limiting and optimization</li>
+            <li>Designed integrations: <span class="highlight">Google Calendar, Zoom, Gmail, Telegram bot</span></li>
+            <li>Built file manager with folder hierarchy, per-org storage tracking and permissions</li>
+            <li>Implemented sensitive data encryption and structured security handling</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="exp-item">
+        <div class="exp-meta">
+          <div class="exp-company">Silkhub.uz</div>
+          <div class="exp-date">Jan 2024 — Jun 2024</div>
+          <div class="exp-location">6 months</div>
+        </div>
+        <div>
+          <div class="exp-role">PYTHON BACKEND DEVELOPER</div>
+          <p class="exp-desc">Developed a tour guide marketplace connecting sellers and buyers.</p>
+          <ul class="exp-bullets">
+            <li>Integrated <span class="highlight">Elasticsearch</span> with fuzzy search, achieving 100% query effectiveness</li>
+            <li>Integrated SMS and email notification services for real-time communication</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="exp-item">
+        <div class="exp-meta">
+          <div class="exp-company">Study Smart</div>
+          <div class="exp-date">Jan 2023 — Jul 2023</div>
+          <div class="exp-location">6 months</div>
+        </div>
+        <div>
+          <div class="exp-role">DJANGO/PYTHON INSTRUCTOR</div>
+          <p class="exp-desc">Teaching Django/Python to students.</p>
+          <ul class="exp-bullets">
+            <li>Developed automated testing systems for student homework evaluation</li>
+            <li>Created workbooks and structured learning materials</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills">
+    <div class="container">
+      <div class="section-label">SKILLS</div>
+      <div class="skills-grid">
+        <div class="skill-group">
+          <div class="skill-group-title">BACKEND</div>
+          <div class="skill-tags">
+            <span class="tag">Python</span>
+            <span class="tag">Django</span>
+            <span class="tag">DRF</span>
+            <span class="tag">FastAPI</span>
+            <span class="tag">REST API</span>
+            <span class="tag">WebSockets</span>
+          </div>
+        </div>
+        <div class="skill-group">
+          <div class="skill-group-title">DATABASE</div>
+          <div class="skill-tags">
+            <span class="tag">PostgreSQL</span>
+            <span class="tag">Redis</span>
+            <span class="tag">Elasticsearch</span>
+            <span class="tag">RabbitMQ</span>
+            <span class="tag">Celery</span>
+          </div>
+        </div>
+        <div class="skill-group">
+          <div class="skill-group-title">DEVOPS & CLOUD</div>
+          <div class="skill-tags">
+            <span class="tag">Docker</span>
+            <span class="tag">AWS S3</span>
+            <span class="tag">AWS RDS</span>
+            <span class="tag">CI/CD</span>
+            <span class="tag">GitHub Actions</span>
+            <span class="tag">Linux</span>
+          </div>
+        </div>
+        <div class="skill-group">
+          <div class="skill-group-title">TESTING & SECURITY</div>
+          <div class="skill-tags">
+            <span class="tag">Pytest</span>
+            <span class="tag">E2E Testing</span>
+            <span class="tag">JWT</span>
+            <span class="tag">OAuth2</span>
+            <span class="tag">Encryption</span>
+          </div>
+        </div>
+        <div class="skill-group">
+          <div class="skill-group-title">FRONTEND</div>
+          <div class="skill-tags">
+            <span class="tag">React.js</span>
+            <span class="tag">JavaScript</span>
+            <span class="tag">TypeScript</span>
+          </div>
+        </div>
+        <div class="skill-group">
+          <div class="skill-group-title">LANGUAGES</div>
+          <div class="skill-tags">
+            <span class="tag">English C1</span>
+            <span class="tag">Uzbek Native</span>
+            <span class="tag">Russian B2</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <div class="container">
+      <div class="section-label">PROJECTS</div>
+      <div class="projects-grid">
+        <div class="project-card">
+          <div class="project-icon">🏢</div>
+          <div class="project-name">HR Platform</div>
+          <p class="project-desc">Advanced HR platform with automated onboarding, meeting management, timezone-aware scheduling, and collision detection.</p>
+          <div class="project-tech">
+            <span class="tech-tag">Django</span>
+            <span class="tech-tag">PostgreSQL</span>
+            <span class="tech-tag">Redis</span>
+            <span class="tech-tag">Celery</span>
+            <span class="tech-tag">React</span>
+          </div>
+        </div>
+        <div class="project-card">
+          <div class="project-icon">🗺️</div>
+          <div class="project-name">Tour Guide Marketplace</div>
+          <p class="project-desc">Marketplace connecting tour guides with buyers, featuring fuzzy search with Elasticsearch and real-time notifications.</p>
+          <div class="project-tech">
+            <span class="tech-tag">Django</span>
+            <span class="tech-tag">Elasticsearch</span>
+            <span class="tech-tag">PostgreSQL</span>
+            <span class="tech-tag">SMS/Email</span>
+          </div>
+        </div>
+        <div class="project-card">
+          <div class="project-icon">📁</div>
+          <div class="project-name">File Manager System</div>
+          <p class="project-desc">Full file management system with folder hierarchy, per-org storage tracking, permissions, and sharing functionality.</p>
+          <div class="project-tech">
+            <span class="tech-tag">Django</span>
+            <span class="tech-tag">AWS S3</span>
+            <span class="tech-tag">PostgreSQL</span>
+            <span class="tech-tag">Redis</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="container">
+      <div class="section-label">CONTACT</div>
+      <div class="contact-grid">
+        <a href="mailto:jalolov.firdavs0809@gmail.com" class="contact-item">
+          <div class="contact-label">EMAIL</div>
+          <div class="contact-value">jalolov.firdavs0809@gmail.com</div>
+        </a>
+        <a href="tel:+998906703502" class="contact-item">
+          <div class="contact-label">PHONE</div>
+          <div class="contact-value">+998 90 670 3502</div>
+        </a>
+        <a href="https://www.linkedin.com/in/jalolov-firdavs/" target="_blank" class="contact-item">
+          <div class="contact-label">LINKEDIN</div>
+          <div class="contact-value">linkedin.com/in/jalolov-firdavs</div>
+        </a>
+        <a href="https://github.com/Firdavs0809" target="_blank" class="contact-item">
+          <div class="contact-label">GITHUB</div>
+          <div class="contact-value">github.com/Firdavs0809</div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>© 2026 Firdavs Jalolov — Built with HTML/CSS</p>
+    </div>
+  </footer>
+</body>
+</html>
